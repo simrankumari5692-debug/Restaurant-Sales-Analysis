@@ -1,0 +1,365 @@
+# ==========================================================
+# RESTAURANT SALES ANALYSIS USING PYTHON
+# ==========================================================
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ----------------------------------------------------------
+# 1. CREATE RESTAURANT DATA
+# ----------------------------------------------------------
+
+data = {
+    "Order_ID": range(1001, 1031),
+
+    "Date": [
+        "2026-01-01", "2026-01-01", "2026-01-01",
+        "2026-01-02", "2026-01-02", "2026-01-02",
+        "2026-01-03", "2026-01-03", "2026-01-03",
+        "2026-01-04", "2026-01-04", "2026-01-04",
+        "2026-01-05", "2026-01-05", "2026-01-05",
+        "2026-01-06", "2026-01-06", "2026-01-06",
+        "2026-01-07", "2026-01-07", "2026-01-07",
+        "2026-01-08", "2026-01-08", "2026-01-08",
+        "2026-01-09", "2026-01-09", "2026-01-09",
+        "2026-01-10", "2026-01-10", "2026-01-10"
+    ],
+
+    "Item": [
+        "Pizza", "Burger", "Biryani",
+        "Coke", "Pasta", "Pizza",
+        "Biryani", "Burger", "Coke",
+        "Pizza", "Pasta", "Biryani",
+        "Burger", "Coke", "Pizza",
+        "Biryani", "Pasta", "Burger",
+        "Pizza", "Coke", "Biryani",
+        "Pasta", "Pizza", "Burger",
+        "Coke", "Biryani", "Pasta",
+        "Pizza", "Burger", "Biryani"
+    ],
+
+    "Category": [
+        "Fast Food", "Fast Food", "Main Course",
+        "Drinks", "Fast Food", "Fast Food",
+        "Main Course", "Fast Food", "Drinks",
+        "Fast Food", "Fast Food", "Main Course",
+        "Fast Food", "Drinks", "Fast Food",
+        "Main Course", "Fast Food", "Fast Food",
+        "Fast Food", "Drinks", "Main Course",
+        "Fast Food", "Fast Food", "Fast Food",
+        "Drinks", "Main Course", "Fast Food",
+        "Fast Food", "Fast Food", "Main Course"
+    ],
+
+    "Quantity": [
+        2, 3, 4,
+        5, 2, 3,
+        4, 2, 6,
+        3, 4, 3,
+        5, 7, 2,
+        4, 3, 4,
+        5, 8, 3,
+        4, 2, 5,
+        6, 4, 3,
+        7, 5, 4
+    ],
+
+    "Price": [
+        250, 150, 200,
+        60, 180, 250,
+        200, 150, 60,
+        250, 180, 200,
+        150, 60, 250,
+        200, 180, 150,
+        250, 60, 200,
+        180, 250, 150,
+        60, 200, 180,
+        250, 150, 200
+    ],
+
+    "Payment": [
+        "UPI", "Cash", "Card",
+        "UPI", "UPI", "Card",
+        "Cash", "UPI", "UPI",
+        "Card", "Cash", "UPI",
+        "Cash", "UPI", "Card",
+        "UPI", "Cash", "Card",
+        "UPI", "UPI", "Card",
+        "Cash", "UPI", "Cash",
+        "UPI", "Card", "Cash",
+        "UPI", "Card", "UPI"
+    ]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Convert Date into datetime
+df["Date"] = pd.to_datetime(df["Date"])
+
+# ----------------------------------------------------------
+# 2. DATA CLEANING
+# ----------------------------------------------------------
+
+print("\n========== DATA INFORMATION ==========")
+print(df.info())
+
+print("\n========== MISSING VALUES ==========")
+print(df.isnull().sum())
+
+# Remove duplicate records
+df = df.drop_duplicates()
+
+# ----------------------------------------------------------
+# 3. CALCULATE TOTAL SALES
+# ----------------------------------------------------------
+
+df["Total_Sales"] = df["Quantity"] * df["Price"]
+
+print("\n========== RESTAURANT DATA ==========")
+print(df)
+
+# ----------------------------------------------------------
+# 4. BASIC SALES STATISTICS
+# ----------------------------------------------------------
+
+total_revenue = df["Total_Sales"].sum()
+total_quantity = df["Quantity"].sum()
+average_sales = df["Total_Sales"].mean()
+
+print("\n========== BASIC STATISTICS ==========")
+print("Total Revenue      : ₹", total_revenue)
+print("Total Items Sold   :", total_quantity)
+print("Average Order Sale : ₹", round(average_sales, 2))
+
+# ----------------------------------------------------------
+# 5. ITEM-WISE ANALYSIS
+# ----------------------------------------------------------
+
+item_sales = df.groupby("Item")["Total_Sales"].sum()
+item_quantity = df.groupby("Item")["Quantity"].sum()
+
+print("\n========== ITEM-WISE SALES ==========")
+print(item_sales.sort_values(ascending=False))
+
+print("\n========== ITEM-WISE QUANTITY ==========")
+print(item_quantity.sort_values(ascending=False))
+
+best_selling_item = item_quantity.idxmax()
+
+print("\nBest Selling Item:", best_selling_item)
+
+# ----------------------------------------------------------
+# 6. CATEGORY-WISE ANALYSIS
+# ----------------------------------------------------------
+
+category_sales = df.groupby("Category")["Total_Sales"].sum()
+
+print("\n========== CATEGORY-WISE SALES ==========")
+print(category_sales.sort_values(ascending=False))
+
+best_category = category_sales.idxmax()
+
+print("\nBest Category:", best_category)
+
+# ----------------------------------------------------------
+# 7. PAYMENT METHOD ANALYSIS
+# ----------------------------------------------------------
+
+payment_sales = df.groupby("Payment")["Total_Sales"].sum()
+
+payment_count = df["Payment"].value_counts()
+
+print("\n========== PAYMENT ANALYSIS ==========")
+print(payment_sales.sort_values(ascending=False))
+
+print("\nNumber of Orders by Payment Method:")
+print(payment_count)
+
+most_used_payment = payment_count.idxmax()
+
+print("\nMost Used Payment Method:", most_used_payment)
+
+# ----------------------------------------------------------
+# 8. DAILY SALES
+# ----------------------------------------------------------
+
+daily_sales = df.groupby("Date")["Total_Sales"].sum()
+
+print("\n========== DAILY SALES ==========")
+print(daily_sales)
+
+best_day = daily_sales.idxmax()
+best_day_sales = daily_sales.max()
+
+print("\nBest Sales Day:", best_day)
+print("Best Day Sales: ₹", best_day_sales)
+
+# ----------------------------------------------------------
+# 9. MONTHLY SALES
+# ----------------------------------------------------------
+
+df["Month"] = df["Date"].dt.strftime("%B")
+
+monthly_sales = df.groupby("Month")["Total_Sales"].sum()
+
+print("\n========== MONTHLY SALES ==========")
+print(monthly_sales)
+
+# ==========================================================
+#                    DATA VISUALIZATION
+# ==========================================================
+
+sns.set_theme(style="whitegrid")
+
+# ----------------------------------------------------------
+# GRAPH 1 - ITEM-WISE SALES
+# ----------------------------------------------------------
+
+plt.figure(figsize=(9, 5))
+
+item_sales.sort_values(ascending=False).plot(
+    kind="bar"
+)
+
+plt.title("Restaurant Sales by Food Item")
+plt.xlabel("Food Item")
+plt.ylabel("Sales (₹)")
+plt.xticks(rotation=0)
+
+plt.tight_layout()
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 2 - QUANTITY SOLD
+# ----------------------------------------------------------
+
+plt.figure(figsize=(9, 5))
+
+item_quantity.sort_values(ascending=False).plot(
+    kind="bar"
+)
+
+plt.title("Quantity Sold by Food Item")
+plt.xlabel("Food Item")
+plt.ylabel("Quantity")
+
+plt.xticks(rotation=0)
+
+plt.tight_layout()
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 3 - CATEGORY-WISE SALES
+# ----------------------------------------------------------
+
+plt.figure(figsize=(8, 5))
+
+category_sales.plot(
+    kind="bar"
+)
+
+plt.title("Category-Wise Restaurant Sales")
+plt.xlabel("Category")
+plt.ylabel("Sales (₹)")
+
+plt.xticks(rotation=0)
+
+plt.tight_layout()
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 4 - PAYMENT METHOD
+# ----------------------------------------------------------
+
+plt.figure(figsize=(7, 7))
+
+payment_sales.plot(
+    kind="pie",
+    autopct="%1.1f%%"
+)
+
+plt.title("Sales by Payment Method")
+plt.ylabel("")
+
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 5 - DAILY SALES
+# ----------------------------------------------------------
+
+plt.figure(figsize=(10, 5))
+
+plt.plot(
+    daily_sales.index,
+    daily_sales.values,
+    marker="o"
+)
+
+plt.title("Daily Restaurant Sales")
+plt.xlabel("Date")
+plt.ylabel("Sales (₹)")
+
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 6 - CATEGORY PIE CHART
+# ----------------------------------------------------------
+
+plt.figure(figsize=(7, 7))
+
+category_sales.plot(
+    kind="pie",
+    autopct="%1.1f%%"
+)
+
+plt.title("Category-Wise Sales Distribution")
+plt.ylabel("")
+
+plt.show()
+
+# ----------------------------------------------------------
+# GRAPH 7 - PAYMENT ORDERS
+# ----------------------------------------------------------
+
+plt.figure(figsize=(8, 5))
+
+payment_count.plot(
+    kind="bar"
+)
+
+plt.title("Orders by Payment Method")
+plt.xlabel("Payment Method")
+plt.ylabel("Number of Orders")
+
+plt.xticks(rotation=0)
+
+plt.tight_layout()
+plt.show()
+
+# ==========================================================
+#                    FINAL INSIGHTS
+# ==========================================================
+
+print("\n")
+print("================================================")
+print("           FINAL PROJECT INSIGHTS")
+print("================================================")
+
+print("1. Total Revenue              : ₹", total_revenue)
+print("2. Total Quantity Sold        :", total_quantity)
+print("3. Average Order Sale         : ₹", round(average_sales, 2))
+print("4. Best Selling Item          :", best_selling_item)
+print("5. Best Performing Category   :", best_category)
+print("6. Most Used Payment Method   :", most_used_payment)
+print("7. Best Sales Day             :", best_day)
+print("8. Highest Sales on Best Day  : ₹", best_day_sales)
+
+print("================================================")
+print("       RESTAURANT SALES ANALYSIS COMPLETED")
+print("================================================")
